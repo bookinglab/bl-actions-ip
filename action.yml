@@ -1,0 +1,17 @@
+name: 'Public IP'
+description: 'Get the public IPv4 and IPv6 address of the GitHub Actions runner'
+author: 'BookingLab'
+
+branding:
+  icon: 'wifi'
+  color: 'blue'
+
+outputs:
+  ipv4:
+    description: 'The public IPv4 address of the runner'
+  ipv6:
+    description: 'The public IPv6 address of the runner (may be empty)'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
