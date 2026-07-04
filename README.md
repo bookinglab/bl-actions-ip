@@ -9,7 +9,7 @@ Drop-in replacement for [`haythem/public-ip`](https://github.com/haythem/public-
 ```yaml
 - name: Get runner public IP
   id: ip
-  uses: bookinglab/public-ip@v1
+  uses: bookinglab/bl-actions-ip@v1
 
 - name: Use the IP
   run: echo "Runner IPv4 is ${{ steps.ip.outputs.ipv4 }}"
@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Get public IP
         id: ip
-        uses: bookinglab/public-ip@v1
+        uses: bookinglab/bl-actions-ip@v1
 
       - name: Whitelist runner in AWS security group
         run: |
@@ -72,7 +72,7 @@ Replace:
 
 With:
 ```yaml
-- uses: bookinglab/public-ip@v1
+- uses: bookinglab/bl-actions-ip@v1
 ```
 
 Output names (`ipv4`, `ipv6`) are identical.
