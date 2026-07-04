@@ -7,6 +7,11 @@ on:
       - 'v*'
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag to release (e.g. v1.0.0)'
+        required: true
 
 permissions:
   contents: write
@@ -47,14 +52,38 @@ jobs:
 
   release:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - name: Resolve version tag
+        id: tag
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="$INPUT_VERSION"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          if ! echo "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Invalid version tag: $TAG (expected e.g. v1.2.3)" >&2
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Create version tag (manual release)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.tag.outputs.tag }}"
+          git push origin "${{ steps.tag.outputs.tag }}"
+
       - name: Update floating major tag
         run: |
-          TAG="${GITHUB_REF#refs/tags/}"
+          TAG="${{ steps.tag.outputs.tag }}"
           MAJOR="${TAG%%.*}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -64,4 +93,5 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.tag.outputs.tag }}
           generate_release_notes: true
