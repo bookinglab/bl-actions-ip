@@ -1,4 +1,4 @@
-name: 'Public IP'
+name: 'BookingLab Public IP'
 description: 'Get the public IPv4 and IPv6 address of the GitHub Actions runner'
 author: 'BookingLab'
 
