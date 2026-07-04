@@ -13,5 +13,5 @@ outputs:
     description: 'The public IPv6 address of the runner (may be empty)'
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
